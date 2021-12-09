@@ -13,3 +13,28 @@
 ## 浅拷贝
 
 ## 深拷贝
+
+```js
+// 深拷贝
+const deepClone = (obj, hash = new WeakMap()) {
+  // null或者undefined
+  if(obj === null) return obj;
+  // 日期
+  if(obj instanceof Date) return new Date(obj);
+  // 正则
+  if(obj instanceof RegExp) return new RegExp(obj);
+  // 普通值或者函数
+  if(typeof obj !== 'object') return obj;
+
+  // 对象需要深拷贝
+  if(hash.get(obj)) return hash.get(obj);
+  let clone = new obj.constructor()
+  hash.set(obj, clone);
+  for(let key in obj) {
+    if(obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key], hash);
+    }
+  }
+  return clone;
+}
+```
