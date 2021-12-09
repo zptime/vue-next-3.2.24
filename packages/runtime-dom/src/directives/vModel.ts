@@ -44,6 +44,7 @@ type ModelDirective<T> = ObjectDirective<T & { _assign: AssignerFn }>
 
 // We are exporting the v-model runtime directly as vnode hooks so that it can
 // be tree-shaken in case v-model is never used.
+// v-model源码解析
 export const vModelText: ModelDirective<
   HTMLInputElement | HTMLTextAreaElement
 > = {

@@ -364,10 +364,11 @@ function baseCreateRenderer(
 
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
+  // 整体解析流程：createApp -> vnode -> element 
   const patch: PatchFn = (
-    n1,
-    n2,
-    container,
+    n1, // 旧vnode，当n1为null时，表示是一次挂载。挂载还是更新由n1决定
+    n2, // 新vnode，根据n2的type进行不同的处理
+    container, // 渲染后会将vnode渲染到container上
     anchor = null,
     parentComponent = null,
     parentSuspense = null,
@@ -380,6 +381,7 @@ function baseCreateRenderer(
     }
 
     // patching & not same type, unmount old tree
+    // 如果新的节点和旧的节点不同，那么会销毁整个子节点树
     if (n1 && !isSameVNodeType(n1, n2)) {
       anchor = getNextHostNode(n1)
       unmount(n1, parentComponent, parentSuspense, true)
@@ -1615,9 +1617,11 @@ function baseCreateRenderer(
     const { patchFlag, shapeFlag } = n2
     // fast path
     if (patchFlag > 0) {
+      
       if (patchFlag & PatchFlags.KEYED_FRAGMENT) {
         // this could be either fully-keyed or mixed (some keyed some not)
         // presence of patchFlag means children are guaranteed to be arrays
+        // 如果列表中有key，那么会执行 patchKeyedChildren 方法
         patchKeyedChildren(
           c1 as VNode[],
           c2 as VNodeArrayChildren,
@@ -1632,6 +1636,7 @@ function baseCreateRenderer(
         return
       } else if (patchFlag & PatchFlags.UNKEYED_FRAGMENT) {
         // unkeyed
+        // 如果列表中没有key，那么会执行 patchUnkeyedChildren 方法
         patchUnkeyedChildren(
           c1 as VNode[],
           c2 as VNodeArrayChildren,
@@ -1698,10 +1703,11 @@ function baseCreateRenderer(
       }
     }
   }
-
+  
+  // 没有key的操作源码
   const patchUnkeyedChildren = (
-    c1: VNode[],
-    c2: VNodeArrayChildren,
+    c1: VNode[], // 旧nodes
+    c2: VNodeArrayChildren, // 新nodes
     container: RendererElement,
     anchor: RendererNode | null,
     parentComponent: ComponentInternalInstance | null,
@@ -1712,10 +1718,14 @@ function baseCreateRenderer(
   ) => {
     c1 = c1 || EMPTY_ARR
     c2 = c2 || EMPTY_ARR
+    // 1. 获取旧节点的长度
     const oldLength = c1.length
+    // 2. 获取新节点的长度
     const newLength = c2.length
+    // 获取最小的那个长度
     const commonLength = Math.min(oldLength, newLength)
     let i
+    // 3. 从0位置开始依次patch比较
     for (i = 0; i < commonLength; i++) {
       const nextChild = (c2[i] = optimized
         ? cloneIfMounted(c2[i] as VNode)
@@ -1732,8 +1742,10 @@ function baseCreateRenderer(
         optimized
       )
     }
+    // 4. 如果旧的节点数大于新的节点数
     if (oldLength > newLength) {
       // remove old
+      // 移除剩余节点
       unmountChildren(
         c1,
         parentComponent,
@@ -1744,6 +1756,7 @@ function baseCreateRenderer(
       )
     } else {
       // mount new
+      // 创建新的节点
       mountChildren(
         c2,
         container,
@@ -1758,6 +1771,7 @@ function baseCreateRenderer(
     }
   }
 
+  // 有key的操作源码
   // can be all-keyed or mixed
   const patchKeyedChildren = (
     c1: VNode[],
@@ -1775,6 +1789,7 @@ function baseCreateRenderer(
     let e1 = c1.length - 1 // prev ending index
     let e2 = l2 - 1 // next ending index
 
+    // 1. 从头部开始遍历，遇到相同的节点就继续，遇到不同的节点就跳出循环
     // 1. sync from start
     // (a b) c
     // (a b) d e
@@ -1783,6 +1798,7 @@ function baseCreateRenderer(
       const n2 = (c2[i] = optimized
         ? cloneIfMounted(c2[i] as VNode)
         : normalizeVNode(c2[i]))
+      // 如果节点相同，那么继续遍历
       if (isSameVNodeType(n1, n2)) {
         patch(
           n1,
@@ -1796,11 +1812,13 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        // 节点不同，就跳出循环
         break
       }
       i++
     }
 
+    // 2. 从尾部开始遍历，遇到相同的节点就继续，遇到不同的节点就跳出循环
     // 2. sync from end
     // a (b c)
     // d e (b c)
@@ -1809,6 +1827,7 @@ function baseCreateRenderer(
       const n2 = (c2[e2] = optimized
         ? cloneIfMounted(c2[e2] as VNode)
         : normalizeVNode(c2[e2]))
+      // 如果节点相同，那么继续遍历
       if (isSameVNodeType(n1, n2)) {
         patch(
           n1,
@@ -1822,12 +1841,14 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        // 节点不同，就跳出循环
         break
       }
       e1--
       e2--
     }
 
+    // 3. 如果最后新节点更多，那么就增加新节点
     // 3. common sequence + mount
     // (a b)
     // (a b) c
@@ -1841,7 +1862,7 @@ function baseCreateRenderer(
         const anchor = nextPos < l2 ? (c2[nextPos] as VNode).el : parentAnchor
         while (i <= e2) {
           patch(
-            null,
+            null, // n1传null，代表挂载
             (c2[i] = optimized
               ? cloneIfMounted(c2[i] as VNode)
               : normalizeVNode(c2[i])),
@@ -1858,6 +1879,7 @@ function baseCreateRenderer(
       }
     }
 
+    // 4. 如果旧节点更多，那么就移除旧节点
     // 4. common sequence + unmount
     // (a b) c
     // (a b)
@@ -1872,6 +1894,8 @@ function baseCreateRenderer(
       }
     }
 
+    // 5. 如果中间存在不知道如何排列的位置序列，那么就使用key建立索引图，最大限度的使用旧节点
+    // 如果是位置的节点序列；如果有多余的节点，那么就移动节点；之后是移动节点和挂载新节点
     // 5. unknown sequence
     // [i ... e1 + 1]: a b [c d e] f g
     // [i ... e2 + 1]: a b [e d c h] f g

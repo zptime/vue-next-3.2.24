@@ -614,7 +614,7 @@ export function applyOptions(instance: ComponentInternalInstance) {
       instance.appContext.config.unwrapInjectedRef
     )
   }
-
+  // methods的处理
   if (methods) {
     for (const key in methods) {
       const methodHandler = (methods as MethodOptions)[key]
@@ -683,9 +683,12 @@ export function applyOptions(instance: ComponentInternalInstance) {
   // state initialization complete at this point - start caching access
   shouldCacheAccess = true
 
+  // computed的处理
   if (computedOptions) {
+    // 遍历对象，对对象中的每个元素进行处理
     for (const key in computedOptions) {
       const opt = (computedOptions as ComputedOptions)[key]
+      // 判断是不是函数 => 函数就取get => 否则在opt中取get
       const get = isFunction(opt)
         ? opt.bind(publicThis, publicThis)
         : isFunction(opt.get)
@@ -694,6 +697,7 @@ export function applyOptions(instance: ComponentInternalInstance) {
       if (__DEV__ && get === NOOP) {
         warn(`Computed property "${key}" has no getter.`)
       }
+      // 直接在opt中去set
       const set =
         !isFunction(opt) && isFunction(opt.set)
           ? opt.set.bind(publicThis)

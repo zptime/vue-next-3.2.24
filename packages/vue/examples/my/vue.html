@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta name="renderer" content="webkit" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keyword" content="测试页" />
+    <meta name="description" content="测试页" />
+    <title>vue3.x 使用html模版片段</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <template id="components">
+      <h2>{{ message }}</h2>
+      <div :[name]="value"></div>
+      <div v-bind="info">绑定对象</div>
+    </template>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+      const App = {
+        template: "#components",
+        data() {
+          return {
+            message: "Hello World!",
+            name: "哈哈哈",
+            value: "111",
+            info: {
+              name: "测试",
+              age: 4,
+              sex: "女",
+            },
+          };
+        },
+      };
+
+      Vue.createApp(App).mount("#app");
+    </script>
+  </body>
+</html>
+
+<!-- 代码片段配置： -->
