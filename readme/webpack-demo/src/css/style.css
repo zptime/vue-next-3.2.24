@@ -1,0 +1,7 @@
+.title {
+  color: red;
+  font-size: 20px;
+  display: flex;
+  /* 需要添加前缀的样式 */
+  user-select: none;
+}

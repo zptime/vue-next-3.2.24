@@ -12,3 +12,4 @@
 6. [methods，computed 和 watch 对比](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/computed.md)
 7. [浅拷贝和深拷贝](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/clone.md)
 8. [v-model 使用及原理](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/model.md)
+9. [webpack](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/webpack.md)
