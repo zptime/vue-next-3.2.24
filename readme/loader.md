@@ -2,6 +2,8 @@
 
 上一节介绍了 webpack 基础，和 css 相关的打包配置，本节继续讲常见的几个 loader
 
+### 介绍
+
 - css 文件模块的加载、提取、处理
   - css-loader：读取和加载 css 文件，负责将.css 文件进行解析
   - style-loader：插入 style，将解析之后的 css 插入到页面中
@@ -14,7 +16,7 @@
   - 资源模块类型(asset module type)：webpack5 开始，可以使用`资源模块类型`代替 raw-loader 、url-loader、file-loader
 - 字体文件的处理：可以使用 file-loader 或 webpack5 的`资源模块类型`处理
 
-注意：webpack5 中，官方已经不推荐使用 file-loader 和 url-loader 了，而是使用 webpack5 自带的资源模块类型(asset module type)，不仅可以处理图片，还可以处理字体文件。默认这个配置是生效的，会将图片和字体打包到根目录 build 下，如果再配置了 file-loader 或 url-loader，就会两个都起作用，生成两套资源文件，所以还是使用 *asset module type* 配置就行。
+注意：webpack5 中，官方已经不推荐使用 file-loader 和 url-loader 了，而是使用 webpack5 自带的资源模块类型(asset module type)，不仅可以处理图片，还可以处理字体文件。默认这个配置是生效的，会将图片和字体打包到根目录 build 下，如果再配置了 file-loader 或 url-loader，就会两个都起作用，生成两套资源文件，所以还是使用 _asset module type_ 配置就行。
 
 ### 安装
 

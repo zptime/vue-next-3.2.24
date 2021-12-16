@@ -15,3 +15,4 @@
 9. [webpack 基础](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/webpack.md)
 10. [webpack 常用 loader](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/loader.md)
 11. [webpack 常用 plugin](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/plugin.md)
+12. [Babel 使用](https://github.com/zptime/vue-next-3.2.24/blob/master/readme/babel.md)
